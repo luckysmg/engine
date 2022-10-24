@@ -44,6 +44,15 @@ namespace impeller {
 #define UNIMPLEMENTED \
   FML_DLOG(ERROR) << "Unimplemented detail in " << __FUNCTION__;
 
+const float kInvertColorMatrix[20] = {
+    // clang-format off
+    -1, 0,  0,  0, 1,
+    0,  -1, 0,  0, 1,
+    0,  0,  -1, 0, 1,
+    0,  0,  0,  1, 0,
+    // clang-format on
+};
+
 DisplayListDispatcher::DisplayListDispatcher() = default;
 
 DisplayListDispatcher::~DisplayListDispatcher() = default;
@@ -506,7 +515,12 @@ void DisplayListDispatcher::setColorFilter(
 
 // |flutter::Dispatcher|
 void DisplayListDispatcher::setInvertColors(bool invert) {
-  UNIMPLEMENTED;
+  paint_.invert_colors = invert;
+  if (invert && !paint_.invert_color_filter.has_value()) {
+    auto invert_colors_filter =
+        std::make_shared<flutter::DlMatrixColorFilter>(kInvertColorMatrix);
+    paint_.invert_color_filter = ToColorFilterProc(invert_colors_filter.get());
+  }
 }
 
 // |flutter::Dispatcher|

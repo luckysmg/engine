@@ -48,7 +48,11 @@ std::shared_ptr<Contents> Paint::WithFilters(
   bool is_solid_color_val = is_solid_color.value_or(!color_source);
   input = WithMaskBlur(input, is_solid_color_val, effect_transform);
   input = WithImageFilter(input, effect_transform);
-  input = WithColorFilter(input);
+  input = WithColorFilter(input, color_filter);
+  if (invert_colors) {
+    FML_DCHECK(invert_color_filter.has_value());
+    input = WithColorFilter(input, invert_color_filter);
+  }
   return input;
 }
 
@@ -57,7 +61,12 @@ std::shared_ptr<Contents> Paint::WithFiltersForSubpassTarget(
     const Matrix& effect_transform) const {
   input = WithMaskBlur(input, false, effect_transform);
   input = WithImageFilter(input, effect_transform);
-  input = WithColorFilter(input, /**absorb_opacity=*/true);
+  input = WithColorFilter(input, color_filter, /**absorb_opacity=*/true);
+  if (invert_colors) {
+    FML_DCHECK(invert_color_filter.has_value());
+    input =
+        WithColorFilter(input, invert_color_filter, /**absorb_opacity=*/true);
+  }
   return input;
 }
 
@@ -84,10 +93,11 @@ std::shared_ptr<Contents> Paint::WithImageFilter(
 
 std::shared_ptr<Contents> Paint::WithColorFilter(
     std::shared_ptr<Contents> input,
+    std::optional<ColorFilterProc> filter,
     bool absorb_opacity) const {
-  if (color_filter.has_value()) {
-    const ColorFilterProc& filter = color_filter.value();
-    auto color_filter_contents = filter(FilterInput::Make(input));
+  if (filter.has_value()) {
+    const ColorFilterProc& filter_proc = filter.value();
+    auto color_filter_contents = filter_proc(FilterInput::Make(input));
     if (color_filter_contents) {
       color_filter_contents->SetAbsorbOpacity(absorb_opacity);
     }

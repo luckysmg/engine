@@ -59,6 +59,8 @@ struct Paint {
   std::optional<ImageFilterProc> image_filter;
   std::optional<ColorFilterProc> color_filter;
   std::optional<MaskBlurDescriptor> mask_blur_descriptor;
+  std::optional<ColorFilterProc> invert_color_filter;
+  bool invert_colors = false;
 
   /// @brief      Wrap this paint's configured filters to the given contents.
   /// @param[in]  input           The contents to wrap with paint's filters.
@@ -103,8 +105,10 @@ struct Paint {
       std::shared_ptr<Contents> input,
       const Matrix& effect_transform) const;
 
-  std::shared_ptr<Contents> WithColorFilter(std::shared_ptr<Contents> input,
-                                            bool absorb_opacity = false) const;
+  std::shared_ptr<Contents> WithColorFilter(
+      std::shared_ptr<Contents> input,
+      std::optional<ColorFilterProc> filter,
+      bool absorb_opacity = false) const;
 };
 
 }  // namespace impeller

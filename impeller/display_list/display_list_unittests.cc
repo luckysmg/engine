@@ -200,6 +200,43 @@ TEST_P(DisplayListTest, CanDrawWithOddPathWinding) {
   ASSERT_TRUE(OpenPlaygroundHere(builder.Build()));
 }
 
+TEST_P(DisplayListTest, CanDrawInvertColors) {
+  flutter::DisplayListBuilder builder;
+  flutter::DlPaint paint;
+  paint.setColor(flutter::DlColor::kRed());
+  builder.drawRect(SkRect::MakeXYWH(100, 100, 200, 200), paint);
+
+  paint.setInvertColors(true);
+  builder.drawRect(SkRect::MakeXYWH(300, 100, 200, 200), paint);
+
+  // Test color with alpha.
+  paint.setInvertColors(false);
+  paint.setColor(flutter::DlColor::kRed().withAlpha(150));
+  builder.drawRect(SkRect::MakeXYWH(100, 400, 200, 200), paint);
+
+  paint.setInvertColors(true);
+  builder.drawRect(SkRect::MakeXYWH(300, 400, 200, 200), paint);
+
+  {
+    const float invert_color_matrix[20] = {
+        -1, 0,  0,  0, 1,  //
+        0,  -1, 0,  0, 1,  //
+        0,  0,  -1, 0, 1,  //
+        0,  0,  0,  1, 0,  //
+    };
+    auto color_filter =
+        std::make_shared<flutter::DlMatrixColorFilter>(invert_color_matrix);
+    // With invert color filter and invert color = true,
+    // the result color should be still red.
+    paint.setColorFilter(color_filter);
+    paint.setInvertColors(true);
+    paint.setColor(flutter::DlColor::kRed());
+    builder.drawRect(SkRect::MakeXYWH(600, 400, 300, 300), paint);
+  }
+
+  ASSERT_TRUE(OpenPlaygroundHere(builder.Build()));
+}
+
 TEST_P(DisplayListTest, CanDrawWithMaskBlur) {
   auto texture = CreateTextureForFixture("embarcadero.jpg");
   flutter::DisplayListBuilder builder;
