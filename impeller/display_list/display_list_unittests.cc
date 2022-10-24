@@ -237,6 +237,18 @@ TEST_P(DisplayListTest, CanDrawInvertColors) {
   ASSERT_TRUE(OpenPlaygroundHere(builder.Build()));
 }
 
+TEST_P(DisplayListTest, CanDrawImageWithInvertColors) {
+  flutter::DisplayListBuilder builder;
+  flutter::DlPaint paint;
+  auto texture = CreateTextureForFixture("boston.jpg");
+  builder.drawImage(DlImageImpeller::Make(texture), SkPoint::Make(100, 100),
+                    flutter::DlImageSampling::kNearestNeighbor, true);
+  builder.setInvertColors(true);
+  builder.drawImage(DlImageImpeller::Make(texture), SkPoint::Make(100, 800),
+                    flutter::DlImageSampling::kNearestNeighbor, true);
+  ASSERT_TRUE(OpenPlaygroundHere(builder.Build()));
+}
+
 TEST_P(DisplayListTest, CanDrawWithMaskBlur) {
   auto texture = CreateTextureForFixture("embarcadero.jpg");
   flutter::DisplayListBuilder builder;
