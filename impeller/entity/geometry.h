@@ -9,7 +9,6 @@
 #include "impeller/entity/solid_fill.vert.h"
 #include "impeller/geometry/color.h"
 #include "impeller/geometry/path.h"
-#include "impeller/geometry/vertices.h"
 #include "impeller/renderer/allocator.h"
 #include "impeller/renderer/host_buffer.h"
 #include "impeller/renderer/vertex_buffer.h"
@@ -21,6 +20,7 @@ class Tessellator;
 struct GeometryResult {
   PrimitiveType type;
   VertexBuffer vertex_buffer;
+  Matrix transform;
   bool prevent_overdraw;
 };
 
@@ -42,20 +42,16 @@ enum class Join {
   kBevel,
 };
 
-class VerticesGeometry;
-
 class Geometry {
  public:
   Geometry();
 
   virtual ~Geometry();
 
-  static std::unique_ptr<VerticesGeometry> MakeVertices(Vertices vertices);
-
-  static std::unique_ptr<Geometry> MakeFillPath(Path path);
+  static std::unique_ptr<Geometry> MakeFillPath(const Path& path);
 
   static std::unique_ptr<Geometry> MakeStrokePath(
-      Path path,
+      const Path& path,
       Scalar stroke_width = 0.0,
       Scalar miter_limit = 4.0,
       Cap stroke_cap = Cap::kButt,
@@ -77,41 +73,21 @@ class Geometry {
 /// @brief A geometry that is created from a vertices object.
 class VerticesGeometry : public Geometry {
  public:
-  explicit VerticesGeometry(Vertices vertices);
+  virtual GeometryResult GetPositionColorBuffer(const ContentContext& renderer,
+                                                const Entity& entity,
+                                                RenderPass& pass,
+                                                Color paint_color,
+                                                BlendMode blend_mode) = 0;
 
-  ~VerticesGeometry();
-
-  GeometryResult GetPositionColorBuffer(const ContentContext& renderer,
-                                        const Entity& entity,
-                                        RenderPass& pass,
-                                        Color paint_color,
-                                        BlendMode blend_mode);
-
-  GeometryResult GetPositionUVBuffer(const ContentContext& renderer,
-                                     const Entity& entity,
-                                     RenderPass& pass);
-
-  // |Geometry|
-  GeometryResult GetPositionBuffer(const ContentContext& renderer,
-                                   const Entity& entity,
-                                   RenderPass& pass) override;
-
-  // |Geometry|
-  std::optional<Rect> GetCoverage(const Matrix& transform) const override;
-
-  // |Geometry|
-  GeometryVertexType GetVertexType() const override;
-
- private:
-  Vertices vertices_;
-
-  FML_DISALLOW_COPY_AND_ASSIGN(VerticesGeometry);
+  virtual GeometryResult GetPositionUVBuffer(const ContentContext& renderer,
+                                             const Entity& entity,
+                                             RenderPass& pass) = 0;
 };
 
 /// @brief A geometry that is created from a filled path object.
 class FillPathGeometry : public Geometry {
  public:
-  explicit FillPathGeometry(Path path);
+  explicit FillPathGeometry(const Path& path);
 
   ~FillPathGeometry();
 
@@ -135,7 +111,7 @@ class FillPathGeometry : public Geometry {
 /// @brief A geometry that is created from a stroked path object.
 class StrokePathGeometry : public Geometry {
  public:
-  StrokePathGeometry(Path path,
+  StrokePathGeometry(const Path& path,
                      Scalar stroke_width,
                      Scalar miter_limit,
                      Cap stroke_cap,

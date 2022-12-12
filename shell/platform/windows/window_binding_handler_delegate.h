@@ -9,6 +9,7 @@
 
 #include "flutter/shell/platform/common/geometry.h"
 #include "flutter/shell/platform/embedder/embedder.h"
+#include "flutter/third_party/accessibility/ax/platform/ax_fragment_root_delegate_win.h"
 #include "flutter/third_party/accessibility/gfx/native_widget_types.h"
 
 namespace flutter {
@@ -122,6 +123,10 @@ class WindowBindingHandlerDelegate {
                         FlutterPointerDeviceKind device_kind,
                         int32_t device_id) = 0;
 
+  // Notifies delegate that scroll inertia should be cancelled.
+  // Typically called by DirectManipulationEventHandler
+  virtual void OnScrollInertiaCancel(int32_t device_id) = 0;
+
   // Notifies delegate that the Flutter semantics tree should be enabled or
   // disabled.
   virtual void OnUpdateSemanticsEnabled(bool enabled) = 0;
@@ -131,6 +136,13 @@ class WindowBindingHandlerDelegate {
 
   // Update the status of the high contrast feature
   virtual void UpdateHighContrastEnabled(bool enabled) = 0;
+
+  // Obtain a pointer to the fragment root delegate.
+  // This is required by UIA in order to obtain the fragment root that
+  // contains a fragment obtained by, for example, a hit test. Unlike
+  // MSAA, UIA elements do not explicitly store or enumerate their
+  // children and parents, so a method such as this is required.
+  virtual ui::AXFragmentRootDelegateWin* GetAxFragmentRootDelegate() = 0;
 };
 
 }  // namespace flutter

@@ -36,18 +36,29 @@ struct Paint {
     kStroke,
   };
 
+  enum class ColorSourceType {
+    kColor,
+    kImage,
+    kLinearGradient,
+    kRadialGradient,
+    kConicalGradient,
+    kSweepGradient,
+    kRuntimeEffect,
+  };
+
   struct MaskBlurDescriptor {
     FilterContents::BlurStyle style;
     Sigma sigma;
 
     std::shared_ptr<FilterContents> CreateMaskBlur(
-        FilterInput::Ref input,
+        const FilterInput::Ref& input,
         bool is_solid_color,
         const Matrix& effect_matrix) const;
   };
 
   Color color = Color::Black();
   std::optional<ColorSourceProc> color_source;
+  ColorSourceType color_source_type = ColorSourceType::kColor;
 
   Scalar stroke_width = 0.0;
   Cap stroke_cap = Cap::kButt;
@@ -90,7 +101,7 @@ struct Paint {
       std::shared_ptr<Contents> input,
       const Matrix& effect_transform = Matrix()) const;
 
-  std::shared_ptr<Contents> CreateContentsForEntity(Path path = {},
+  std::shared_ptr<Contents> CreateContentsForEntity(const Path& path = {},
                                                     bool cover = false) const;
 
   std::shared_ptr<Contents> CreateContentsForGeometry(

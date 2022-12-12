@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:js/js_util.dart' as js_util;
 import 'package:test/bootstrap/browser.dart';
 import 'package:test/test.dart';
 import 'package:ui/src/engine.dart';
@@ -337,8 +338,8 @@ void testMain() {
         _platformView,
         _overlay,
         _platformView,
-        _platformView,
         _overlay,
+        _platformView,
       ]);
 
       // Frame 2:
@@ -389,16 +390,16 @@ void testMain() {
         _platformView,
         _overlay,
         _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
         _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
+        _platformView,
+        _platformView,
+        _platformView,
+        _platformView,
+        _platformView,
+        _platformView,
       ]);
 
       // Frame 5:
@@ -491,10 +492,10 @@ void testMain() {
         _platformView,
         _overlay,
         _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
         _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
       ]);
 
       // Frame 2:
@@ -518,10 +519,10 @@ void testMain() {
         _platformView,
         _overlay,
         _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
         _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
       ]);
 
       // Frame 3:
@@ -544,10 +545,10 @@ void testMain() {
         _platformView,
         _overlay,
         _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
         _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
       ]);
 
       // Frame 4:
@@ -570,10 +571,10 @@ void testMain() {
         _platformView,
         _overlay,
         _platformView,
-        _platformView,
-        _platformView,
-        _platformView,
         _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
       ]);
 
       // TODO(yjbanov): skipped due to https://github.com/flutter/flutter/issues/73867
@@ -804,8 +805,13 @@ void testMain() {
 
     test('works correctly with max overlays == 2', () async {
       final Rasterizer rasterizer = CanvasKitRenderer.instance.rasterizer;
-      debugSetConfiguration(FlutterConfiguration(
-          JsFlutterConfiguration()..canvasKitMaximumSurfaces = 2));
+      final FlutterConfiguration config = FlutterConfiguration()
+        ..setUserConfiguration(
+          js_util.jsify(<String, Object?>{
+            'canvasKitMaximumSurfaces': 2,
+          }) as JsFlutterConfiguration);
+      debugSetConfiguration(config);
+
       SurfaceFactory.instance.debugClear();
 
       expect(SurfaceFactory.instance.maximumSurfaces, 2);
@@ -842,12 +848,12 @@ void testMain() {
       _expectSceneMatches(<_EmbeddedViewMarker>[
         _overlay,
         _platformView,
-        _platformView,
         _overlay,
+        _platformView,
       ]);
 
       // Reset configuration
-      debugSetConfiguration(FlutterConfiguration(null));
+      debugSetConfiguration(FlutterConfiguration());
     });
 
     test(

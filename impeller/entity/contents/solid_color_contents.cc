@@ -66,13 +66,12 @@ bool SolidColorContents::Render(const ContentContext& renderer,
     options.stencil_operation = StencilOperation::kIncrementClamp;
   }
 
+  options.primitive_type = geometry_result.type;
   cmd.pipeline = renderer.GetSolidFillPipeline(options);
   cmd.BindVertices(geometry_result.vertex_buffer);
-  cmd.primitive_type = geometry_result.type;
 
   VS::VertInfo vert_info;
-  vert_info.mvp = Matrix::MakeOrthographic(pass.GetRenderTargetSize()) *
-                  entity.GetTransformation();
+  vert_info.mvp = geometry_result.transform;
   VS::BindVertInfo(cmd, pass.GetTransientsBuffer().EmplaceUniform(vert_info));
 
   FS::FragInfo frag_info;
@@ -89,10 +88,10 @@ bool SolidColorContents::Render(const ContentContext& renderer,
   return true;
 }
 
-std::unique_ptr<SolidColorContents> SolidColorContents::Make(Path path,
+std::unique_ptr<SolidColorContents> SolidColorContents::Make(const Path& path,
                                                              Color color) {
   auto contents = std::make_unique<SolidColorContents>();
-  contents->SetGeometry(Geometry::MakeFillPath(std::move(path)));
+  contents->SetGeometry(Geometry::MakeFillPath(path));
   contents->SetColor(color);
   return contents;
 }
