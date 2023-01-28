@@ -691,8 +691,17 @@ static void SendFakeTouchEvent(FlutterEngine* engine,
 
 #pragma mark - UIViewController lifecycle notifications
 
+- (void)link {
+}
+
 - (void)viewDidLoad {
   TRACE_EVENT0("flutter", "viewDidLoad");
+
+  // Force Refresh rate to 120 (which is same in VsyncWaiter)
+  // Don't adding this is also ok, but refresh rate seems not be 120HZ.
+  CADisplayLink* link = [CADisplayLink displayLinkWithTarget:self selector:@selector(link)];
+  link.preferredFramesPerSecond = 120;
+  [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 
   if (_engine && _engineNeedsLaunch) {
     [_engine.get() launchEngine:nil libraryURI:nil entrypointArgs:nil];

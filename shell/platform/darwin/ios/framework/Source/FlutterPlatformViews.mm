@@ -770,7 +770,7 @@ bool FlutterPlatformViewsController::SubmitFrame(GrDirectContext* gr_context,
   // Mark all layers as available, so they can be used in the next frame.
   layer_pool_->RecycleLayers();
 
-  did_submit &= frame->Submit();
+  //  did_submit &= frame->Submit();
 
   // If the frame is submitted with embedded platform views,
   // there should be a |[CATransaction begin]| call in this frame prior to all the drawing.
@@ -899,14 +899,14 @@ void FlutterPlatformViewsController::DisposeViews() {
 void FlutterPlatformViewsController::BeginCATransaction() {
   FML_DCHECK([[NSThread currentThread] isMainThread]);
   FML_DCHECK(!catransaction_added_);
-  [CATransaction begin];
+  //  [CATransaction begin];
   catransaction_added_ = true;
 }
 
 void FlutterPlatformViewsController::CommitCATransactionIfNeeded() {
   if (catransaction_added_) {
     FML_DCHECK([[NSThread currentThread] isMainThread]);
-    [CATransaction commit];
+    //    [CATransaction commit];
     catransaction_added_ = false;
   }
 }
