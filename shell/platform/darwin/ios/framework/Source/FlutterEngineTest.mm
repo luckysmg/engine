@@ -325,8 +325,7 @@ FLUTTER_ASSERT_ARC
   [engine runWithEntrypoint:FlutterDefaultDartEntrypoint initialRoute:@"test"];
   [engine flutterTextInputView:nil didResignFirstResponderWithTextInputClient:1];
   FlutterMethodCall* methodCall =
-      [FlutterMethodCall methodCallWithMethodName:@"TextInputClient.onConnectionClosed"
-                                        arguments:@[ @(1) ]];
+      [FlutterMethodCall methodCallWithMethodName:@"TextInputClient.unfocus" arguments:@[ @(1) ]];
   NSData* encodedMethodCall = [[FlutterJSONMethodCodec sharedInstance] encodeMethodCall:methodCall];
   OCMVerify([mockBinaryMessenger sendOnChannel:@"flutter/textinput" message:encodedMethodCall]);
 }
