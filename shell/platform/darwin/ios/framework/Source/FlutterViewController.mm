@@ -1819,8 +1819,8 @@ static flutter::PointerData::DeviceKind DeviceKindFromTouchType(UITouch* touch) 
         }
         UIWindowScene* windowScene = (UIWindowScene*)scene;
         UIWindowSceneGeometryPreferencesIOS* preference =
-            [[UIWindowSceneGeometryPreferencesIOS alloc]
-                initWithInterfaceOrientations:_orientationPreferences];
+            [[[UIWindowSceneGeometryPreferencesIOS alloc]
+                initWithInterfaceOrientations:_orientationPreferences] autorelease];
         [windowScene
             requestGeometryUpdateWithPreferences:preference
                                     errorHandler:^(NSError* error) {
